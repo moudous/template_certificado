@@ -48,6 +48,8 @@
 
     <form action="processar.php" method="POST" enctype="multipart/form-data">
 
+        <label>Fundo</label>
+
         <input type="file" name="imagem" accept="image/*" required>
 
         <button type="submit">

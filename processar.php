@@ -80,6 +80,22 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
             margin-top:10px;
             color:#555;
         }
+        select{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+        }
+
+        hr{
+            margin-top:20px;
+            margin-bottom:20px;
+        }
+
+        canvas{
+            max-width:100%;
+            height:auto;
+        }   
+
 
     </style>
 </head>
@@ -95,18 +111,50 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
     </div>
 
-    <div class="painel">
+   <div class="painel">
 
-        <label>Texto do certificado</label>
+        <label>Nome</label>
+        <input type="text" id="nome" value="Nome do Participante">
+        <hr>
 
-        <input type="text" id="texto" value="Nome do Participante">
+        <label>Carga Horária</label>
+        <input type="text" id="cargaHoraria" value="40 horas">
+        <hr>
 
-        <label>Tamanho da fonte</label>
 
+        <label>Texto 1:</label>
+        <textarea id="texto1" rows="5">Este certificado comprova a participação...</textarea>
+
+        <hr>
+
+        <label>Largura Assinatura</label>
+        <input type="number" id="assinatura1Largura" value="300">
+
+              
+        <hr>
+        <label>Altura Assinatura</label>
+        <input type="number" id="assinatura1Altura" value="300">
+
+<hr>
+
+        <label>Tamanho da Fonte</label> 
         <input type="number" id="fonte" value="40">
 
+         <hr>
+
+
+
+        <label>Campo selecionado</label>
+
+        <select id="campoSelecionado">
+            <option value="nome">Nome</option>
+            <option value="carga">Carga Horária</option>
+            <option value="texto1">Texto 1</option>
+            <option value="assinatura1">Assinatura 1</option>
+        </select>
+
         <div class="info">
-            Clique na imagem para posicionar o texto.
+            Escolha o campo acima e clique na imagem para posicionar.
         </div>
 
         <button onclick="gerarPDF()">
@@ -117,6 +165,7 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
 </div>
 
+
 <script>
 
 const canvas = document.getElementById('canvas');
@@ -126,89 +175,511 @@ const imagem = new Image();
 
 imagem.src = '<?= $caminho ?>';
 
-let posX = 100;
-let posY = 100;
+// ==========================
+// POSIÇÕES
+// ==========================
+
+let posNomeX = 100;
+let posNomeY = 100;
+
+let posAss1X = 100;
+let posAss1Y = 500;
+
+//assinatura
+let imgAss1 = new Image();
+
+imgAss1.onload = function(){
+
+    console.log('assinatura carregada');
+
+    desenhar();
+
+};
+
+imgAss1.onerror = function(){
+
+    console.log('erro ao carregar assinatura');
+
+};
+
+imgAss1.src = 'imagens/assinatura1.png';
+
+
+let posCargaX = 100;
+let posCargaY = 200;
+
+let posTexto1X = 100;
+let posTexto1Y = 300;
+
+// ==========================
+// FONTES MEMORIZADAS
+// ==========================
+
+let fonteNome = 40;
+let fonteCarga = 28;
+let fonteTexto1 = 24;
+
+// ==========================
+// CARREGAMENTO
+// ==========================
 
 imagem.onload = function(){
 
-    // tamanho REAL da imagem
     const larguraOriginal = imagem.width;
     const alturaOriginal = imagem.height;
 
-    // largura máxima visual
     const maxLargura = window.innerWidth - 380;
 
     let escala = 1;
 
-    // reduz proporcionalmente
     if(larguraOriginal > maxLargura){
         escala = maxLargura / larguraOriginal;
     }
 
-    // canvas VISUAL
     canvas.width = larguraOriginal * escala;
     canvas.height = alturaOriginal * escala;
 
-    // salva proporção
     canvas.dataset.escala = escala;
 
     desenhar();
 
 };
 
+// ==========================
+// DESENHAR TEXTO MULTILINHA
+// ==========================
+
+function desenharTextoMultilinha(
+    texto,
+    x,
+    y,
+    larguraMaxima,
+    alturaLinha
+){
+
+    const palavras = texto.split(' ');
+
+    let linha = '';
+
+    let yAtual = y;
+
+    for(let n = 0; n < palavras.length; n++){
+
+        const testeLinha =
+            linha + palavras[n] + ' ';
+
+        const medidas =
+            ctx.measureText(testeLinha);
+
+        const larguraTeste =
+            medidas.width;
+
+        if(
+            larguraTeste > larguraMaxima
+            &&
+            n > 0
+        ){
+
+            ctx.fillText(linha,x,yAtual);
+
+            linha = palavras[n] + ' ';
+
+            yAtual += alturaLinha;
+
+        }else{
+
+            linha = testeLinha;
+
+        }
+
+    }
+
+    ctx.fillText(linha,x,yAtual);
+
+}
+
+
+
+
+// ==========================
+// DESENHAR
+// ==========================
+
 function desenhar(){
+
+    const escala =
+        parseFloat(canvas.dataset.escala || 1);
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    ctx.drawImage(imagem,0,0);
+    // fundo
+    ctx.drawImage(
+        imagem,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
-    let texto = document.getElementById('texto').value;
+    // =========================
+    // NOME
+    // =========================
 
-    let fonte = document.getElementById('fonte').value;
-
-    ctx.font = fonte + 'px Arial';
+    ctx.font =
+        (fonteNome * escala) + 'px Arial';
 
     ctx.fillStyle = 'black';
 
-    ctx.fillText(texto,posX,posY);
+    ctx.fillText(
+        document.getElementById('nome').value,
+        posNomeX * escala,
+        posNomeY * escala
+    );
+
+    // =========================
+    // CARGA HORÁRIA
+    // =========================
+
+    ctx.font =
+        (fonteCarga * escala) + 'px Arial';
+
+    ctx.fillText(
+        document.getElementById('cargaHoraria').value,
+        posCargaX * escala,
+        posCargaY * escala
+    );
+
+    // =========================
+    // TEXTO1
+    // =========================
+
+    ctx.font =
+        (fonteTexto1 * escala) + 'px Arial';
+
+    desenharTextoMultilinha(
+        document.getElementById('texto1').value,
+        posTexto1X * escala,
+        posTexto1Y * escala,
+        900 * escala,
+        (fonteTexto1 + 10) * escala
+    );
+
+    // =========================
+    // ASSINATURA
+    // =========================
+
+    if(imgAss1.complete){
+
+        const larguraAss =
+            parseInt(
+                document.getElementById(
+                    'assinatura1Largura'
+                ).value
+            );
+
+        const alturaAss =
+            parseInt(
+                document.getElementById(
+                    'assinatura1Altura'
+                ).value
+            );
+
+        ctx.drawImage(
+            imgAss1,
+            posAss1X * escala,
+            posAss1Y * escala,
+            larguraAss * escala,
+            alturaAss * escala
+        );
+
+    }
 
 }
+
+// ==========================
+// CLIQUE CANVAS
+// ==========================
 
 canvas.addEventListener('click',function(e){
 
     const rect = canvas.getBoundingClientRect();
 
-    posX = e.clientX - rect.left;
+    const escala =
+        parseFloat(canvas.dataset.escala || 1);
 
-    posY = e.clientY - rect.top;
+    const x = (e.clientX - rect.left) / escala;
+
+    const y = (e.clientY - rect.top) / escala;
+
+    const campo =
+        document.getElementById('campoSelecionado').value;
+
+    if(campo == 'nome'){
+
+        posNomeX = x;
+        posNomeY = y;
+
+    }
+    else if(campo == 'carga'){
+
+        posCargaX = x;
+        posCargaY = y;
+
+    }
+    else if(campo == 'texto1'){
+
+        posTexto1X = x;
+        posTexto1Y = y;
+
+    }
+    else if(campo == 'assinatura1'){
+
+        posAss1X = x;
+        posAss1Y = y;
+
+    }
 
     desenhar();
 
 });
 
-document.getElementById('texto').addEventListener('input',desenhar);
 
-document.getElementById('fonte').addEventListener('input',desenhar);
+
+
+// ==========================
+// TROCA CAMPO
+// ==========================
+
+document.getElementById('campoSelecionado')
+.addEventListener('change',function(){
+
+    const campo = this.value;
+
+    if(campo == 'nome'){
+
+        document.getElementById('fonte').value =
+            fonteNome;
+
+    }
+    else if(campo == 'carga'){
+
+        document.getElementById('fonte').value =
+            fonteCarga;
+
+    }
+    else if(campo == 'texto1'){
+
+        document.getElementById('fonte').value =
+            fonteTexto1;
+
+    }
+
+});
+
+// ==========================
+// ALTERAÇÃO FONTE
+// ==========================
+
+document.getElementById('fonte')
+.addEventListener('input',function(){
+
+    const valor = parseInt(this.value);
+
+    const campo =
+        document.getElementById('campoSelecionado').value;
+
+    if(campo == 'nome'){
+
+        fonteNome = valor;
+
+    }
+    else if(campo == 'carga'){
+
+        fonteCarga = valor;
+
+    }
+    else if(campo == 'texto1'){
+
+        fonteTexto1 = valor;
+
+    }
+
+    desenhar();
+
+});
+
+// ==========================
+// EVENTOS
+// ==========================
+
+document.getElementById('nome')
+.addEventListener('input',desenhar);
+
+document.getElementById('cargaHoraria')
+.addEventListener('input',desenhar);
+
+document.getElementById('texto1')
+.addEventListener('input',desenhar);
+
+document.getElementById('assinatura1Largura')
+.addEventListener('input',desenhar);
+
+document.getElementById('assinatura1Altura')
+.addEventListener('input',desenhar);
+
+
+// ==========================
+// FONTE INICIAL
+// ==========================
+
+document.getElementById('fonte').value =
+    fonteNome;
+
+// ==========================
+// PDF
+// ==========================
 
 async function gerarPDF(){
 
     const { jsPDF } = window.jspdf;
 
+    const canvasReal =
+        document.createElement('canvas');
+
+    canvasReal.width = imagem.width;
+
+    canvasReal.height = imagem.height;
+
+    const ctxReal =
+        canvasReal.getContext('2d');
+
+    // fundo
+    ctxReal.drawImage(imagem,0,0);
+
+    // nome
+    ctxReal.font = fonteNome + 'px Arial';
+
+    ctxReal.fillStyle = 'black';
+
+    ctxReal.fillText(
+        document.getElementById('nome').value,
+        posNomeX,
+        posNomeY
+    );
+
+    // carga
+    ctxReal.font = fonteCarga + 'px Arial';
+
+    ctxReal.fillText(
+        document.getElementById('cargaHoraria').value,
+        posCargaX,
+        posCargaY
+    );
+
+    // texto1
+    ctxReal.font = fonteTexto1 + 'px Arial';
+
+    const texto1 =
+        document.getElementById('texto1').value;
+
+    const palavras = texto1.split(' ');
+
+    let linha = '';
+
+    let yAtual = posTexto1Y;
+
+    for(let n = 0; n < palavras.length; n++){
+
+        const testeLinha =
+            linha + palavras[n] + ' ';
+
+        const larguraTeste =
+            ctxReal.measureText(testeLinha).width;
+
+        if(larguraTeste > 900 && n > 0){
+
+            ctxReal.fillText(
+                linha,
+                posTexto1X,
+                yAtual
+            );
+
+            linha = palavras[n] + ' ';
+
+            yAtual += fonteTexto1 + 10;
+
+        }else{
+
+            linha = testeLinha;
+
+        }
+
+    }
+
+    ctxReal.fillText(
+        linha,
+        posTexto1X,
+        yAtual
+    );
+
+    // assinatura
+    if(imgAss1.complete){
+
+        const larguraAss =
+            parseInt(
+                document.getElementById(
+                    'assinatura1Largura'
+                ).value
+            );
+
+        const alturaAss =
+            parseInt(
+                document.getElementById(
+                    'assinatura1Altura'
+                ).value
+            );
+
+        ctxReal.drawImage(
+            imgAss1,
+            posAss1X,
+            posAss1Y,
+            larguraAss,
+            alturaAss
+        );
+
+    }
+
+    // PDF
     const pdf = new jsPDF({
         orientation:'landscape',
         unit:'px',
-        format:[canvas.width,canvas.height]
+        format:[
+            imagem.width,
+            imagem.height
+        ]
     });
 
-    const imgData = canvas.toDataURL('image/png');
+    const imgData =
+        canvasReal.toDataURL('image/png');
 
-    pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);
+    pdf.addImage(
+        imgData,
+        'PNG',
+        0,
+        0,
+        imagem.width,
+        imagem.height
+    );
 
     pdf.save('certificado.pdf');
 
 }
 
 </script>
+
+
+
+
 
 </body>
 </html>

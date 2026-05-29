@@ -96,6 +96,24 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
             height:auto;
         }   
 
+        //fontes
+        @font-face{
+            font-family:'Roboto';
+            src:url('fontes/Roboto.ttf');
+        }
+
+        @font-face{
+            font-family:'OpenSans';
+            src:url('fontes/OpenSans.ttf');
+        }
+
+        @font-face{
+            font-family:'GreatVibes';
+            src:url('fontes/GreatVibes.ttf');
+        }
+
+
+
 
     </style>
 </head>
@@ -135,13 +153,24 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
         <label>Altura Assinatura</label>
         <input type="number" id="assinatura1Altura" value="300">
 
-<hr>
+        <hr>
 
         <label>Tamanho da Fonte</label> 
         <input type="number" id="fonte" value="40">
 
-         <hr>
+        <hr>
 
+        <label>Fonte</label>
+
+        <select id="fonteFamilia">
+
+            <option value="Arial">Arial</option>
+            <option value="Roboto">Roboto</option>
+            <option value="OpenSans">OpenSans</option>
+            <option value="GreatVibes">GreatVibes</option>
+
+        </select>
+         
 
 
         <label>Campo selecionado</label>
@@ -170,6 +199,12 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+let fonteTexto1 = 24;
+
+let familiaNome = 'Arial';
+let familiaCarga = 'Arial';
+let familiaTexto1 = 'Arial';
 
 const imagem = new Image();
 
@@ -326,7 +361,7 @@ function desenhar(){
     // =========================
 
     ctx.font =
-        (fonteNome * escala) + 'px Arial';
+        (fonteCarga * escala) + 'px ' + familiaCarga;
 
     ctx.fillStyle = 'black';
 
@@ -476,6 +511,8 @@ document.getElementById('campoSelecionado')
 
 });
 
+//e
+
 // ==========================
 // ALTERAÇÃO FONTE
 // ==========================
@@ -526,6 +563,35 @@ document.getElementById('assinatura1Largura')
 
 document.getElementById('assinatura1Altura')
 .addEventListener('input',desenhar);
+
+//evento campo fonte
+document.getElementById('fonteFamilia')
+.addEventListener('change',function(){
+
+    const valor = this.value;
+
+    const campo =
+        document.getElementById('campoSelecionado').value;
+
+    if(campo == 'nome'){
+
+        familiaNome = valor;
+
+    }
+    else if(campo == 'carga'){
+
+        familiaCarga = valor;
+
+    }
+    else if(campo == 'texto1'){
+
+        familiaTexto1 = valor;
+
+    }
+
+    desenhar();
+
+});
 
 
 // ==========================

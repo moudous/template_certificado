@@ -96,7 +96,7 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
             height:auto;
         }   
 
-        //fontes
+        /* fontes*/
         @font-face{
             font-family:'Roboto';
             src:url('fontes/Roboto.ttf');
@@ -200,11 +200,12 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-let fonteTexto1 = 24;
 
 let familiaNome = 'Arial';
 let familiaCarga = 'Arial';
 let familiaTexto1 = 'Arial';
+
+let fonteSelecionadaAtual = 'Arial';
 
 const imagem = new Image();
 
@@ -361,7 +362,7 @@ function desenhar(){
     // =========================
 
     ctx.font =
-        (fonteCarga * escala) + 'px ' + familiaCarga;
+        (fonteNome * escala) + 'px ' + familiaNome;
 
     ctx.fillStyle = 'black';
 
@@ -376,7 +377,7 @@ function desenhar(){
     // =========================
 
     ctx.font =
-        (fonteCarga * escala) + 'px Arial';
+        (fonteCarga * escala) + 'px ' + familiaCarga;
 
     ctx.fillText(
         document.getElementById('cargaHoraria').value,
@@ -389,7 +390,7 @@ function desenhar(){
     // =========================
 
     ctx.font =
-        (fonteTexto1 * escala) + 'px Arial';
+        (fonteTexto1 * escala) + 'px ' + familiaTexto1;
 
     desenharTextoMultilinha(
         document.getElementById('texto1').value,
@@ -605,139 +606,159 @@ document.getElementById('fonte').value =
 // PDF
 // ==========================
 
+
+//Converter fonte TTF
+function carregarFonte(
+    TCPDF $pdf,
+    string $fonte
+){
+
+    $arquivo =
+        __DIR__ .
+        '/fonts/' .
+        $fonte .
+        '.ttf';
+
+    if(!file_exists($arquivo)){
+        return 'helvetica';
+    }
+
+    return TCPDF_FONTS::addTTFfont(
+        $arquivo,
+        'TrueTypeUnicode',
+        '',
+        96
+    );
+}
+
+
+//crregar fonte nome
+$fonteNome =
+    carregarFonte(
+        $pdf,
+        $dados['familiaNome']
+    );
+
+$pdf->SetFont(
+    $fonteNome,
+    '',
+    $dados['fonteNome']
+);
+
+$pdf->Text(
+    $dados['posNomeX'],
+    $dados['posNomeY'],
+    $dados['nome']
+);
+
+//fonte carga horária
+$fonteCarga =
+    carregarFonte(
+        $pdf,
+        $dados['familiaCarga']
+    );
+
+$pdf->SetFont(
+    $fonteCarga,
+    '',
+    $dados['fonteCarga']
+);
+
+$pdf->Text(
+    $dados['posCargaX'],
+    $dados['posCargaY'],
+    $dados['cargaHoraria']
+);
+
+//fonte texto1
+$fonteTexto1 =
+    carregarFonte(
+        $pdf,
+        $dados['familiaTexto1']
+    );
+
+$pdf->SetFont(
+    $fonteTexto1,
+    '',
+    $dados['fonteTexto1']
+);
+
+$pdf->MultiCell(
+    900,
+    0,
+    $dados['texto1'],
+    0,
+    'L',
+    false,
+    1,
+    $dados['posTexto1X'],
+    $dados['posTexto1Y']
+);
+
+
+
+
+
 async function gerarPDF(){
 
-    const { jsPDF } = window.jspdf;
+    const dados = {
 
-    const canvasReal =
-        document.createElement('canvas');
+        imagem : '<?= $caminho ?>',
 
-    canvasReal.width = imagem.width;
+        nome : document.getElementById('nome').value,
 
-    canvasReal.height = imagem.height;
+        cargaHoraria :
+            document.getElementById('cargaHoraria').value,
 
-    const ctxReal =
-        canvasReal.getContext('2d');
+        texto1 :
+            document.getElementById('texto1').value,
 
-    // fundo
-    ctxReal.drawImage(imagem,0,0);
-
-    // nome
-    ctxReal.font = fonteNome + 'px Arial';
-
-    ctxReal.fillStyle = 'black';
-
-    ctxReal.fillText(
-        document.getElementById('nome').value,
         posNomeX,
-        posNomeY
-    );
+        posNomeY,
 
-    // carga
-    ctxReal.font = fonteCarga + 'px Arial';
-
-    ctxReal.fillText(
-        document.getElementById('cargaHoraria').value,
         posCargaX,
-        posCargaY
-    );
+        posCargaY,
 
-    // texto1
-    ctxReal.font = fonteTexto1 + 'px Arial';
-
-    const texto1 =
-        document.getElementById('texto1').value;
-
-    const palavras = texto1.split(' ');
-
-    let linha = '';
-
-    let yAtual = posTexto1Y;
-
-    for(let n = 0; n < palavras.length; n++){
-
-        const testeLinha =
-            linha + palavras[n] + ' ';
-
-        const larguraTeste =
-            ctxReal.measureText(testeLinha).width;
-
-        if(larguraTeste > 900 && n > 0){
-
-            ctxReal.fillText(
-                linha,
-                posTexto1X,
-                yAtual
-            );
-
-            linha = palavras[n] + ' ';
-
-            yAtual += fonteTexto1 + 10;
-
-        }else{
-
-            linha = testeLinha;
-
-        }
-
-    }
-
-    ctxReal.fillText(
-        linha,
         posTexto1X,
-        yAtual
-    );
+        posTexto1Y,
 
-    // assinatura
-    if(imgAss1.complete){
+        posAss1X,
+        posAss1Y,
 
-        const larguraAss =
-            parseInt(
-                document.getElementById(
-                    'assinatura1Largura'
-                ).value
-            );
+        fonteNome,
+        fonteCarga,
+        fonteTexto1,
 
-        const alturaAss =
-            parseInt(
-                document.getElementById(
-                    'assinatura1Altura'
-                ).value
-            );
+        familiaNome,
+        familiaCarga,
+        familiaTexto1,
 
-        ctxReal.drawImage(
-            imgAss1,
-            posAss1X,
-            posAss1Y,
-            larguraAss,
-            alturaAss
+        assinatura1Largura :
+            document.getElementById('assinatura1Largura').value,
+
+        assinatura1Altura :
+            document.getElementById('assinatura1Altura').value
+
+    };
+
+    const resposta =
+        await fetch(
+            'gerar_pdf.php',
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify(dados)
+            }
         );
 
-    }
+    const blob = await resposta.blob();
 
-    // PDF
-    const pdf = new jsPDF({
-        orientation:'landscape',
-        unit:'px',
-        format:[
-            imagem.width,
-            imagem.height
-        ]
-    });
+    const url =
+        window.URL.createObjectURL(blob);
 
-    const imgData =
-        canvasReal.toDataURL('image/png');
-
-    pdf.addImage(
-        imgData,
-        'PNG',
-        0,
-        0,
-        imagem.width,
-        imagem.height
-    );
-
-    pdf.save('certificado.pdf');
+    window.open(url);
 
 }
 

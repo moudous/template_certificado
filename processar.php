@@ -141,7 +141,7 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
 
         <label>Texto 1:</label>
-        <textarea id="texto1" rows="5">Este certificado comprova a participação...</textarea>
+        <textarea id="texto1" rows="5">Este certificado comprova a participação Este certificado comprova a participação Este certificado comprova a participação Este certificado comprova a participação Este certificado comprova a participaçãoEste certificado comprova a participação ...</textarea>
 
         <hr>
 
@@ -607,93 +607,7 @@ document.getElementById('fonte').value =
 // ==========================
 
 
-//Converter fonte TTF
-function carregarFonte(
-    TCPDF $pdf,
-    string $fonte
-){
 
-    $arquivo =
-        __DIR__ .
-        '/fonts/' .
-        $fonte .
-        '.ttf';
-
-    if(!file_exists($arquivo)){
-        return 'helvetica';
-    }
-
-    return TCPDF_FONTS::addTTFfont(
-        $arquivo,
-        'TrueTypeUnicode',
-        '',
-        96
-    );
-}
-
-
-//crregar fonte nome
-$fonteNome =
-    carregarFonte(
-        $pdf,
-        $dados['familiaNome']
-    );
-
-$pdf->SetFont(
-    $fonteNome,
-    '',
-    $dados['fonteNome']
-);
-
-$pdf->Text(
-    $dados['posNomeX'],
-    $dados['posNomeY'],
-    $dados['nome']
-);
-
-//fonte carga horária
-$fonteCarga =
-    carregarFonte(
-        $pdf,
-        $dados['familiaCarga']
-    );
-
-$pdf->SetFont(
-    $fonteCarga,
-    '',
-    $dados['fonteCarga']
-);
-
-$pdf->Text(
-    $dados['posCargaX'],
-    $dados['posCargaY'],
-    $dados['cargaHoraria']
-);
-
-//fonte texto1
-$fonteTexto1 =
-    carregarFonte(
-        $pdf,
-        $dados['familiaTexto1']
-    );
-
-$pdf->SetFont(
-    $fonteTexto1,
-    '',
-    $dados['fonteTexto1']
-);
-
-$pdf->MultiCell(
-    900,
-    0,
-    $dados['texto1'],
-    0,
-    'L',
-    false,
-    1,
-    $dados['posTexto1X'],
-    $dados['posTexto1Y']
-);
 
 
 
@@ -704,6 +618,9 @@ async function gerarPDF(){
     const dados = {
 
         imagem : '<?= $caminho ?>',
+
+        larguraImagem : imagem.width,
+        alturaImagem  : imagem.height,
 
         nome : document.getElementById('nome').value,
 

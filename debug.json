@@ -1,0 +1,22 @@
+{
+    "imagem": "uploads\/1780398953_certificado teste.png",
+    "nome": "",
+    "cargaHoraria": "",
+    "texto1": "Este certificado comprova a participa\u00e7\u00e3o de Marcelo Ribeiro, com carga hor\u00e1riade  asdfasdfasdfa sdfasdfasdfasdf asdfasdfa",
+    "posNomeX": 646,
+    "posNomeY": 597.1666717529297,
+    "posCargaX": 835,
+    "posCargaY": 380.1666717529297,
+    "posTexto1X": 931,
+    "posTexto1Y": 232.1666717529297,
+    "posAss1X": 367,
+    "posAss1Y": 620.1666717529297,
+    "fonteNome": 40,
+    "fonteCarga": 28,
+    "fonteTexto1": 30,
+    "familiaNome": "Arial",
+    "familiaCarga": "Arial",
+    "familiaTexto1": "Arial",
+    "assinatura1Largura": "266",
+    "assinatura1Altura": "90"
+}

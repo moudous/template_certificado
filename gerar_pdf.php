@@ -13,21 +13,17 @@ $dados =
 
 
 $pdf = new TCPDF(
-    'P',
+    'L',
     'px',
     [
-        $dados['alturaImagem'],
-        $dados['larguraImagem']
+        $dados['larguraImagem'],
+        $dados['alturaImagem']
     ]
 );
 
 $pdf->SetMargins(0,0,0);
 
 $pdf->AddPage();
-
-echo 'Largura: '.$pdf->getPageWidth().'<br>';
-echo 'Altura: '.$pdf->getPageHeight();
-exit;
 
 
 
@@ -38,8 +34,8 @@ $pdf->Image(
     __DIR__ . '/' . $dados['imagem'],
     0,
     0,
-    $dados['larguraImagem'],
     $dados['alturaImagem'],
+    $dados['larguraImagem'],
     '',
     '',
     '',

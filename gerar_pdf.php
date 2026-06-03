@@ -16,12 +16,18 @@ $pdf = new TCPDF(
     'L',
     'px',
     [
-        $dados['larguraImagem'],
-        $dados['alturaImagem']
+       
+       $dados['larguraImagem'],
+       $dados['alturaImagem']
     ]
 );
 
+$pdf->setImageScale(1);
+
+//$pdf->setImageScale(96/72);
+
 $pdf->SetMargins(0,0,0);
+$pdf->SetAutoPageBreak(false,0);
 
 $pdf->AddPage();
 
@@ -30,18 +36,29 @@ $pdf->AddPage();
 $imagem =
     __DIR__ . '/' . $dados['imagem'];
 
+
 $pdf->Image(
-    __DIR__ . '/' . $dados['imagem'],
+    $imagem,
     0,
     0,
-    $dados['alturaImagem'],
     $dados['larguraImagem'],
-    '',
+    $dados['alturaImagem'],
+    'PNG',
     '',
     '',
     false,
-    300
-);;
+    72,
+    '',
+    false,
+    false,
+    0,
+    false,
+    false,
+    false
+);
+
+
+
 
 // assinatura
 $pdf->Image(

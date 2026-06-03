@@ -58,7 +58,7 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
         input{
             width:100%;
             padding:10px;
-            margin-top:10px;
+            margin-top:10px; 
         }
 
         button{
@@ -160,6 +160,24 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
         <hr>
 
+        <label>Largura da Caixa</label>
+        <input
+            type="number"
+            id="larguraCaixa"
+            value="400"
+        >
+
+        <hr>
+
+        <label>Altura da Caixa</label>
+        <input
+            type="number"
+            id="alturaCaixa"
+            value="60"
+        >
+
+        <hr>
+
         <label>Fonte</label>
 
         <select id="fonteFamilia">
@@ -211,6 +229,14 @@ const imagem = new Image();
 
 imagem.src = '<?= $caminho ?>';
 
+console.log(imagem.src);
+
+imagem.onload = function(){
+
+    console.log('imagem carregada');
+
+};
+
 // ==========================
 // POSIÇÕES
 // ==========================
@@ -256,8 +282,35 @@ let fonteCarga = 28;
 let fonteTexto1 = 24;
 
 // ==========================
+// ARRASTAR E SOLTAR
+// ==========================
+let arrastando = false;
+let objetoArrastando = null;
+
+
+
+// ==========================
+// TAMANHO DAS CAIXAS DE TEXTO
+// ==========================
+
+let larguraNome = 400;
+let alturaNome = 60;
+
+let larguraCarga = 300;
+let alturaCarga = 50;
+
+let larguraTexto1 = 900;
+let alturaTexto1 = 200;
+
+
+// ==========================
 // CARREGAMENTO
 // ==========================
+
+
+
+
+ let escala = 1;
 
 imagem.onload = function(){
 
@@ -266,7 +319,6 @@ imagem.onload = function(){
 
     const maxLargura = window.innerWidth - 380;
 
-    let escala = 1;
 
     if(larguraOriginal > maxLargura){
         escala = maxLargura / larguraOriginal;
@@ -396,7 +448,7 @@ function desenhar(){
         document.getElementById('texto1').value,
         posTexto1X * escala,
         posTexto1Y * escala,
-        900 * escala,
+        larguraTexto1 * escala,
         (fonteTexto1 + 10) * escala
     );
 
@@ -436,48 +488,211 @@ function desenhar(){
 // CLIQUE CANVAS
 // ==========================
 
-canvas.addEventListener('click',function(e){
+function obterPosicaoMouse(e){
 
     const rect = canvas.getBoundingClientRect();
 
     const escala =
         parseFloat(canvas.dataset.escala || 1);
 
-    const x = (e.clientX - rect.left) / escala;
+    return {
 
-    const y = (e.clientY - rect.top) / escala;
+        x : (e.clientX - rect.left) / escala,
+        y : (e.clientY - rect.top) / escala
 
-    const campo =
-        document.getElementById('campoSelecionado').value;
+    };
 
-    if(campo == 'nome'){
+}
 
-        posNomeX = x;
-        posNomeY = y;
+    //MOUSE DOWN
 
-    }
-    else if(campo == 'carga'){
+    let larguraAss = parseInt(
+        document.getElementById(
+            'assinatura1Largura'
+        ).value
+    );
 
-        posCargaX = x;
-        posCargaY = y;
+    let alturaAss = parseInt(
+        document.getElementById(
+            'assinatura1Altura'
+        ).value
+    );
+    
+    canvas.addEventListener('mousedown',function(e){
 
-    }
-    else if(campo == 'texto1'){
+        const pos = obterPosicaoMouse(e);
 
-        posTexto1X = x;
-        posTexto1Y = y;
+        const x = pos.x;
+        const y = pos.y;
 
-    }
-    else if(campo == 'assinatura1'){
+        // Nome
+        if(
+            x >= posNomeX &&
+            x <= posNomeX + 400 &&
+            y >= posNomeY - fonteNome &&
+            y <= posNomeY + 10
+        ){
+            objetoArrastando = 'nome';
 
-        posAss1X = x;
-        posAss1Y = y;
+            //alterando o combo - nome
+            document.getElementById(
+                'campoSelecionado'
+            ).value = 'nome';
 
-    }
+            document.getElementById('fonte').value = fonteNome;
+            
+        }
 
-    desenhar();
+        // Carga
+        else if(
+            x >= posCargaX &&
+            x <= posCargaX + 300 &&
+            y >= posCargaY - fonteCarga &&
+            y <= posCargaY + 10
+        ){
+            objetoArrastando = 'carga';
 
-});
+            //alterando o combo - carga
+            document.getElementById(
+                'campoSelecionado'
+            ).value = 'carga';
+
+            document.getElementById('fonte').value = fonteCarga;
+
+        }
+
+        // Texto
+        else if(
+            x >= posTexto1X &&
+            x <= posTexto1X + 900 &&
+            y >= posTexto1Y - fonteTexto1 &&
+            y <= posTexto1Y + 200
+        ){
+            objetoArrastando = 'texto1';
+
+            //alterando o combo - texto1
+            document.getElementById(
+                'campoSelecionado'
+            ).value = 'texto1';
+
+            //fonte
+            document.getElementById('fonte').value = fonteTexto1;
+        }
+
+        // Assinatura
+        else{
+
+            const larguraAss =
+                parseInt(
+                    document.getElementById(
+                        'assinatura1Largura'
+                    ).value
+                );
+
+            const alturaAss =
+                parseInt(
+                    document.getElementById(
+                        'assinatura1Altura'
+                    ).value
+                );
+
+            if(
+                x >= posAss1X &&
+                x <= posAss1X + larguraAss &&
+                y >= posAss1Y &&
+                y <= posAss1Y + alturaAss
+            ){
+                objetoArrastando = 'assinatura1';
+
+                document.getElementById(
+                    'campoSelecionado'
+                ).value = 'assinatura1';
+            }
+
+        }
+
+        if(objetoArrastando){
+            arrastando = true;
+        }
+
+    });
+
+
+    //MOUSE MOVE
+
+    canvas.addEventListener('mousemove',function(e){
+
+        if(!arrastando){
+            return;
+        }
+
+        const pos = obterPosicaoMouse(e);
+
+        if(objetoArrastando == 'nome'){
+
+            posNomeX = pos.x;
+            posNomeY = pos.y;
+
+        }
+        else if(objetoArrastando == 'carga'){
+
+            posCargaX = pos.x;
+            posCargaY = pos.y;
+
+        }
+        else if(objetoArrastando == 'texto1'){
+
+            posTexto1X = pos.x;
+            posTexto1Y = pos.y;
+
+        }
+        else if(objetoArrastando == 'assinatura1'){
+
+            posAss1X = pos.x;
+            posAss1Y = pos.y;
+
+        }
+
+        desenhar();
+
+    });
+
+    //MOUSE UP
+    canvas.addEventListener('mouseup',function(){
+
+        arrastando = false;
+
+        objetoArrastando = null;
+
+    });
+
+    //MOUSE LEAVE
+    canvas.addEventListener('mouseleave',function(){
+
+        arrastando = false;
+
+        objetoArrastando = null;
+
+    });
+
+    //BORDAR VERMELHA na assinatura
+    ctx.strokeStyle = 'red';
+
+   ctx.strokeRect(
+        posCargaX * escala,
+        (posCargaY - fonteCarga) * escala,
+        larguraCarga * escala,
+        alturaCarga * escala
+    );
+
+    //BORDAR VERMELHA nos textos
+    ctx.strokeRect(
+        posNomeX * escala,
+        (posNomeY - fonteNome) * escala,
+        400 * escala,
+        fonteNome * escala
+    );
+
 
 
 
@@ -605,11 +820,6 @@ document.getElementById('fonte').value =
 // ==========================
 // PDF
 // ==========================
-
-
-
-
-
 
 
 

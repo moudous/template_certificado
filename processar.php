@@ -160,21 +160,13 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
         <hr>
 
-        <label>Largura da Caixa</label>
-        <input
-            type="number"
-            id="larguraCaixa"
-            value="400"
-        >
+        <label>Largura cx. texto</label>
+        <input type="number" id="larguraCaixaTexto">
 
         <hr>
-
-        <label>Altura da Caixa</label>
-        <input
-            type="number"
-            id="alturaCaixa"
-            value="60"
-        >
+0       
+        <label>Altura cx. texto</label>
+        <input type="number" id="alturaCaixaTexto">
 
         <hr>
 
@@ -217,6 +209,18 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+//larguras e alturas cx de texto
+let larguraNome = 400;
+let alturaNome = 60;
+
+let larguraCarga = 300;
+let alturaCarga = 60;
+
+let larguraTexto1 = 900;
+let alturaTexto1 = 200;
+
+let objetoSelecionado = 'nome';
 
 
 let familiaNome = 'Arial';
@@ -534,6 +538,15 @@ function obterPosicaoMouse(e){
         ){
             objetoArrastando = 'nome';
 
+            //alterando a largura e altura da caixa de texto
+            document.getElementById(
+                'larguraCaixaTexto'
+            ).value = larguraNome;
+
+            document.getElementById(
+                'alturaCaixaTexto'
+            ).value = alturaNome;
+
             //alterando o combo - nome
             document.getElementById(
                 'campoSelecionado'
@@ -552,10 +565,14 @@ function obterPosicaoMouse(e){
         ){
             objetoArrastando = 'carga';
 
-            //alterando o combo - carga
+            //alterando a largura e altura da caixa de texto
             document.getElementById(
-                'campoSelecionado'
-            ).value = 'carga';
+                'larguraCaixaTexto'
+            ).value = larguraCarga;
+
+            document.getElementById(
+                'alturaCaixaTexto'
+            ).value = alturaCarga;
 
             document.getElementById('fonte').value = fonteCarga;
 
@@ -569,6 +586,15 @@ function obterPosicaoMouse(e){
             y <= posTexto1Y + 200
         ){
             objetoArrastando = 'texto1';
+
+            //alterando a largura e altura da caixa de texto        
+            document.getElementById(
+                'larguraCaixaTexto'
+            ).value = larguraTexto1;
+
+            document.getElementById(
+                'alturaCaixaTexto'
+            ).value = alturaTexto1;
 
             //alterando o combo - texto1
             document.getElementById(
@@ -614,6 +640,49 @@ function obterPosicaoMouse(e){
         if(objetoArrastando){
             arrastando = true;
         }
+
+    });
+
+    //evento da largura
+
+        document.getElementById(
+            'larguraCaixaTexto'
+            ).addEventListener('input', function(){
+
+            let valor = parseInt(this.value);
+
+            if(objetoSelecionado == 'nome'){
+                larguraNome = valor;
+            }
+            else if(objetoSelecionado == 'carga'){
+                larguraCarga = valor;
+            }
+            else if(objetoSelecionado == 'texto1'){
+                larguraTexto1 = valor;
+            }
+
+            desenhar();
+
+        });
+
+    //evento da altura
+    document.getElementById(
+        'alturaCaixaTexto'
+    ).addEventListener('input', function(){
+
+        let valor = parseInt(this.value);
+
+        if(objetoSelecionado == 'nome'){
+            alturaNome = valor;
+        }
+        else if(objetoSelecionado == 'carga'){
+            alturaCarga = valor;
+        }
+        else if(objetoSelecionado == 'texto1'){
+            alturaTexto1 = valor;
+        }
+
+        desenhar();
 
     });
 
@@ -674,6 +743,31 @@ function obterPosicaoMouse(e){
         objetoArrastando = null;
 
     });
+
+    //dimensoes nas caixas - nome
+    ctx.strokeRect(
+        posNomeX * escala,
+        (posNomeY - fonteNome) * escala,
+        larguraNome * escala,
+        alturaNome * escala
+    );
+
+    //dimensoes nas caixas - carga
+    ctx.strokeRect(
+        posCargaX * escala,
+        (posCargaY - fonteCarga) * escala,
+        larguraCarga * escala,
+        alturaCarga * escala
+    );
+
+    //dimensoes nas caixas - texto1
+    ctx.strokeRect(
+        posTexto1X * escala,
+        (posTexto1Y - fonteTexto1) * escala,
+        larguraTexto1 * escala,
+        alturaTexto1 * escala
+    );
+
 
     //BORDAR VERMELHA na assinatura
     ctx.strokeStyle = 'red';

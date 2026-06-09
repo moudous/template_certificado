@@ -10,6 +10,9 @@ $dados =
         true
     );
 
+$ajusteX = (float)$dados['ajusteX'];
+$ajusteY = (float)$dados['ajusteY'];
+
 
 
 $pdf = new TCPDF(
@@ -63,8 +66,8 @@ $pdf->Image(
 // assinatura
 $pdf->Image(
     __DIR__.'/imagens/assinatura1.png',
-    $dados['posAss1X'],
-    $dados['posAss1Y'],
+    $dados['posAss1X'] + $ajusteX,
+    $dados['posAss1Y'] + $ajusteY,
     $dados['assinatura1Largura'],
     $dados['assinatura1Altura'],
     'PNG'
@@ -111,9 +114,9 @@ $pdf->SetFont(
 );
 
 $pdf->Text(
-    $dados['posNomeX'],
-    $dados['posNomeY'],
-    $dados['nome']
+   $dados['posNomeX'] + $ajusteX,
+   $dados['posNomeY'] + $ajusteY,
+   $dados['nome']
 );
 
 //fonte carga horária
@@ -130,8 +133,8 @@ $pdf->SetFont(
 );
 
 $pdf->Text(
-    $dados['posCargaX'],
-    $dados['posCargaY'],
+    $dados['posCargaX'] + $ajusteX,
+    $dados['posCargaY'] + $ajusteY,
     $dados['cargaHoraria']
 );
 
@@ -149,15 +152,15 @@ $pdf->SetFont(
 );
 
 $pdf->MultiCell(
-    900,
+    $dados['larguraTexto1'],
     0,
     $dados['texto1'],
     0,
     'L',
     false,
     1,
-    $dados['posTexto1X'],
-    $dados['posTexto1Y']
+    $dados['posTexto1X'] + $ajusteX,
+    $dados['posTexto1Y'] + $ajusteY
 );
 
 $pdf->Output('certificado.pdf', 'I');

@@ -25,6 +25,58 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+    <script>
+
+    // =====================================
+    // CONFIGURAÇÃO INICIAL
+    // =====================================
+    const CONFIG = {
+
+        nome: 'Nome do Participante',
+
+        cargaHoraria: '40 horas',
+
+        texto1: 'Este certificado comprova a participação...',
+
+        posNomeX: 100,
+        posNomeY: 100,
+
+        posCargaX: 100,
+        posCargaY: 200,
+
+        posTexto1X: 100,
+        posTexto1Y: 300,
+
+        posAss1X: 100,
+        posAss1Y: 500,
+
+        fonteNome: 40,
+        fonteCarga: 28,
+        fonteTexto1: 24,
+
+        familiaNome: 'Arial',
+        familiaCarga: 'Arial',
+        familiaTexto1: 'Arial',
+
+        larguraNome: 400,
+        alturaNome: 60,
+
+        larguraCarga: 300,
+        alturaCarga: 60,
+
+        larguraTexto1: 900,
+        alturaTexto1: 200,
+
+        assinatura1Largura: 300,
+        assinatura1Altura: 300,
+
+        ajusteX: 0,
+        ajusteY: 0
+
+    };
+
+    </script>
+
     <style>
 
         body{
@@ -132,7 +184,7 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
    <div class="painel">
 
         <label>Nome</label>
-        <input type="text" id="nome" value="Nome do Participante">
+        <input type="text" id="nome" value="Marcelo Ribeiro da Silva">
         <hr>
 
         <label>Carga Horária</label>
@@ -146,12 +198,12 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
         <hr>
 
         <label>Largura Assinatura</label>
-        <input type="number" id="assinatura1Largura" value="300">
+        <input type="number" id="assinatura1Largura" value="100">
 
               
         <hr>
         <label>Altura Assinatura</label>
-        <input type="number" id="assinatura1Altura" value="300">
+        <input type="number" id="assinatura1Altura" value="50">
 
         <hr>
 
@@ -161,12 +213,12 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
         <hr>
 
         <label>Largura cx. texto</label>
-        <input type="number" id="larguraCaixaTexto">
+        <input type="number"  id="larguraCaixaTexto">
 
         <hr>
-0       
+       
         <label>Altura cx. texto</label>
-        <input type="number" id="alturaCaixaTexto">
+        <input type="number"  id="alturaCaixaTexto">
 
         <hr>
 
@@ -196,6 +248,14 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
             Escolha o campo acima e clique na imagem para posicionar.
         </div>
 
+        <label>Ajuste X</label>
+        <input type="number" id="ajusteX" value="0">
+
+        <hr>
+
+        <label>Ajuste Y</label>
+        <input type="number" id="ajusteY" value="-20">
+
         <button onclick="gerarPDF()">
             Processar PDF
         </button>
@@ -211,56 +271,39 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 //larguras e alturas cx de texto
-let larguraNome = 400;
-let alturaNome = 60;
+let larguraNome = CONFIG.larguraNome;
+let alturaNome = CONFIG.alturaNome;
 
-let larguraCarga = 300;
-let alturaCarga = 60;
+let larguraCarga = CONFIG.larguraCarga;
+let alturaCarga = CONFIG.alturaCarga;
 
-let larguraTexto1 = 900;
-let alturaTexto1 = 200;
+let larguraTexto1 = CONFIG.larguraTexto1;
+let alturaTexto1 = CONFIG.alturaTexto1;
 
 let objetoSelecionado = 'nome';
 
 
-let familiaNome = 'Arial';
-let familiaCarga = 'Arial';
-let familiaTexto1 = 'Arial';
+let familiaNome = CONFIG.familiaNome;
+let familiaCarga = CONFIG.familiaCarga;
+let familiaTexto1 = CONFIG.familiaTexto1;
 
 let fonteSelecionadaAtual = 'Arial';
 
-const imagem = new Image();
 
-imagem.src = '<?= $caminho ?>';
-
-console.log(imagem.src);
-
-imagem.onload = function(){
-
-    console.log('imagem carregada');
-
-};
 
 // ==========================
 // POSIÇÕES
 // ==========================
 
-let posNomeX = 100;
-let posNomeY = 100;
+let posNomeX = CONFIG.posNomeX;
+let posNomeY = CONFIG.posNomeY;
 
-let posAss1X = 100;
-let posAss1Y = 500;
+let posAss1X = CONFIG.posAss1X;
+let posAss1Y = CONFIG.posAss1Y;
 
 //assinatura
 let imgAss1 = new Image();
 
-imgAss1.onload = function(){
-
-    console.log('assinatura carregada');
-
-    desenhar();
-
-};
 
 imgAss1.onerror = function(){
 
@@ -271,19 +314,19 @@ imgAss1.onerror = function(){
 imgAss1.src = 'imagens/assinatura1.png';
 
 
-let posCargaX = 100;
-let posCargaY = 200;
+let posCargaX = CONFIG.posCargaX;
+let posCargaY = CONFIG.posCargaY;
 
-let posTexto1X = 100;
-let posTexto1Y = 300;
+let posTexto1X = CONFIG.posTexto1X;
+let posTexto1Y = CONFIG.posTexto1Y;
 
 // ==========================
 // FONTES MEMORIZADAS
 // ==========================
 
-let fonteNome = 40;
-let fonteCarga = 28;
-let fonteTexto1 = 24;
+let fonteNome = CONFIG.fonteNome;
+let fonteCarga = CONFIG.fonteCarga;
+let fonteTexto1 = CONFIG.fonteTexto1;
 
 // ==========================
 // ARRASTAR E SOLTAR
@@ -296,7 +339,7 @@ let objetoArrastando = null;
 // ==========================
 // TAMANHO DAS CAIXAS DE TEXTO
 // ==========================
-
+/*
 let larguraNome = 400;
 let alturaNome = 60;
 
@@ -305,7 +348,7 @@ let alturaCarga = 50;
 
 let larguraTexto1 = 900;
 let alturaTexto1 = 200;
-
+*/
 
 // ==========================
 // CARREGAMENTO
@@ -316,13 +359,18 @@ let alturaTexto1 = 200;
 
  let escala = 1;
 
+const imagem = new Image();
+
 imagem.onload = function(){
+
+    console.log('Imagem carregada');
 
     const larguraOriginal = imagem.width;
     const alturaOriginal = imagem.height;
 
     const maxLargura = window.innerWidth - 380;
 
+    escala = 1;
 
     if(larguraOriginal > maxLargura){
         escala = maxLargura / larguraOriginal;
@@ -336,6 +384,15 @@ imagem.onload = function(){
     desenhar();
 
 };
+
+imagem.onerror = function(){
+
+    console.error('Erro ao carregar imagem');
+    console.log(imagem.src);
+
+};
+
+imagem.src = '<?= htmlspecialchars($caminho) ?>';
 
 // ==========================
 // DESENHAR TEXTO MULTILINHA
@@ -537,6 +594,7 @@ function obterPosicaoMouse(e){
             y <= posNomeY + 10
         ){
             objetoArrastando = 'nome';
+            objetoSelecionado = 'nome';
 
             //alterando a largura e altura da caixa de texto
             document.getElementById(
@@ -564,7 +622,8 @@ function obterPosicaoMouse(e){
             y <= posCargaY + 10
         ){
             objetoArrastando = 'carga';
-
+            objetoSelecionado = 'carga';
+            
             //alterando a largura e altura da caixa de texto
             document.getElementById(
                 'larguraCaixaTexto'
@@ -586,6 +645,7 @@ function obterPosicaoMouse(e){
             y <= posTexto1Y + 200
         ){
             objetoArrastando = 'texto1';
+            objetoSelecionado = 'texto1';
 
             //alterando a largura e altura da caixa de texto        
             document.getElementById(
@@ -629,6 +689,7 @@ function obterPosicaoMouse(e){
                 y <= posAss1Y + alturaAss
             ){
                 objetoArrastando = 'assinatura1';
+                objetoSelecionado = 'assinatura1';
 
                 document.getElementById(
                     'campoSelecionado'
@@ -769,28 +830,7 @@ function obterPosicaoMouse(e){
     );
 
 
-    //BORDAR VERMELHA na assinatura
-    ctx.strokeStyle = 'red';
-
-   ctx.strokeRect(
-        posCargaX * escala,
-        (posCargaY - fonteCarga) * escala,
-        larguraCarga * escala,
-        alturaCarga * escala
-    );
-
-    //BORDAR VERMELHA nos textos
-    ctx.strokeRect(
-        posNomeX * escala,
-        (posNomeY - fonteNome) * escala,
-        400 * escala,
-        fonteNome * escala
-    );
-
-
-
-
-
+    
 // ==========================
 // TROCA CAMPO
 // ==========================
@@ -923,6 +963,11 @@ async function gerarPDF(){
 
         imagem : '<?= $caminho ?>',
 
+        ajusteX : document.getElementById('ajusteX').value,
+        ajusteY : document.getElementById('ajusteY').value,
+
+        
+
         larguraImagem : imagem.width,
         alturaImagem  : imagem.height,
 
@@ -954,11 +999,21 @@ async function gerarPDF(){
         familiaCarga,
         familiaTexto1,
 
+        larguraNome,
+        alturaNome,
+
+        larguraCarga,
+        alturaCarga,
+
+        larguraTexto1,
+        alturaTexto1,
+
         assinatura1Largura :
             document.getElementById('assinatura1Largura').value,
 
         assinatura1Altura :
-            document.getElementById('assinatura1Altura').value
+            document.getElementById('assinatura1Altura').value,
+
 
     };
 

@@ -27,6 +27,8 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
 
     <script>
 
+        
+
     // =====================================
     // CONFIGURAÇÃO INICIAL
     // =====================================
@@ -71,7 +73,11 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
         assinatura1Altura: 300,
 
         ajusteX: 0,
-        ajusteY: 0
+        ajusteY: 0,
+
+        alinhamentoNome: 'L',
+        alinhamentoCarga: 'L',
+        alinhamentoTexto1: 'L'
 
     };
 
@@ -232,7 +238,15 @@ move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho);
             <option value="GreatVibes">GreatVibes</option>
 
         </select>
-         
+
+        <label>Alinhamento</label>
+        <select id="alinhamento">
+            <option value="L">Esquerda</option>
+            <option value="C">Centralizado</option>
+            <option value="R">Direita</option>
+            <option value="J">Justificado</option>
+        </select>
+                
 
 
         <label>Campo selecionado</label>
@@ -289,7 +303,10 @@ let familiaTexto1 = CONFIG.familiaTexto1;
 
 let fonteSelecionadaAtual = 'Arial';
 
-
+//alinhamento
+let alinhamentoNome = CONFIG.alinhamentoNome;
+let alinhamentoCarga = CONFIG.alinhamentoCarga;
+let alinhamentoTexto1 = CONFIG.alinhamentoTexto1;
 
 // ==========================
 // POSIÇÕES
@@ -334,21 +351,10 @@ let fonteTexto1 = CONFIG.fonteTexto1;
 let arrastando = false;
 let objetoArrastando = null;
 
+//alinhamento
 
 
-// ==========================
-// TAMANHO DAS CAIXAS DE TEXTO
-// ==========================
-/*
-let larguraNome = 400;
-let alturaNome = 60;
 
-let larguraCarga = 300;
-let alturaCarga = 50;
-
-let larguraTexto1 = 900;
-let alturaTexto1 = 200;
-*/
 
 // ==========================
 // CARREGAMENTO
@@ -429,7 +435,25 @@ function desenharTextoMultilinha(
             n > 0
         ){
 
-            ctx.fillText(linha,x,yAtual);
+            
+            //alinhamento
+            let xTexto = x;
+
+            if(alinhamento == 'C'){
+                xTexto = x + (larguraMaxima / 2);
+                ctx.textAlign = 'center';
+            }
+            else if(alinhamento == 'R'){
+                xTexto = x + larguraMaxima;
+                ctx.textAlign = 'right';
+            }
+            else{
+                xTexto = x;
+                ctx.textAlign = 'left';
+            }
+        
+        
+            ctx.fillText(linha,xTexto,yAtual);
 
             linha = palavras[n] + ' ';
 
@@ -444,6 +468,7 @@ function desenharTextoMultilinha(
     }
 
     ctx.fillText(linha,x,yAtual);
+
 
 }
 
@@ -503,14 +528,47 @@ function desenhar(){
     // =========================
 
     ctx.font =
-        (fonteTexto1 * escala) + 'px ' + familiaTexto1;
+    (fonteTexto1 * escala) + 'px ' + familiaTexto1;
 
-    desenharTextoMultilinha(
+        let alinhamentoCanvas = 'left';
+
+        if(alinhamentoTexto1 == 'C'){
+            alinhamentoCanvas = 'center';
+        }
+        else if(alinhamentoTexto1 == 'R'){
+            alinhamentoCanvas = 'right';
+        }
+        else if(alinhamentoTexto1 == 'J'){
+            alinhamentoCanvas = 'left'; // Canvas não suporta justify
+    }
+
+    console.log(alinhamentoTexto1);
+
+    ctx.textAlign = alinhamentoCanvas;
+
+    let xTexto = posTexto1X * escala;
+
+    if(alinhamentoTexto1 == 'C'){
+        xTexto =
+            (posTexto1X * escala)
+            +
+            ((larguraTexto1 * escala) / 2);
+    }
+
+    if(alinhamentoTexto1 == 'R'){
+        xTexto =
+            (posTexto1X * escala)
+            +
+            (larguraTexto1 * escala);
+    }
+
+   desenharTextoMultilinha(
         document.getElementById('texto1').value,
-        posTexto1X * escala,
+        xTexto,
         posTexto1Y * escala,
         larguraTexto1 * escala,
-        (fonteTexto1 + 10) * escala
+        (fonteTexto1 + 10) * escala,
+        alinhamentoTexto1
     );
 
     // =========================
@@ -979,6 +1037,9 @@ async function gerarPDF(){
         texto1 :
             document.getElementById('texto1').value,
 
+        alinhamento :
+            document.getElementById('alinhamento').value,
+
         posNomeX,
         posNomeY,
 
@@ -1007,6 +1068,10 @@ async function gerarPDF(){
 
         larguraTexto1,
         alturaTexto1,
+
+        alinhamentoNome,
+        alinhamentoCarga,
+        alinhamentoTexto1,
 
         assinatura1Largura :
             document.getElementById('assinatura1Largura').value,

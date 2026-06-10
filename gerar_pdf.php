@@ -95,7 +95,7 @@ function carregarFonte(
         $arquivo,
         'TrueTypeUnicode',
         '',
-        96
+        72
     );
 }
 
@@ -113,11 +113,15 @@ $pdf->SetFont(
     $dados['fonteNome']
 );
 
+
 $pdf->Text(
    $dados['posNomeX'] + $ajusteX,
    $dados['posNomeY'] + $ajusteY,
    $dados['nome']
 );
+
+
+
 
 //fonte carga horária
 $fonteCarga =
@@ -156,7 +160,7 @@ $pdf->MultiCell(
     0,
     $dados['texto1'],
     0,
-    'L',
+    $dados['alinhamentoTexto1'],
     false,
     1,
     $dados['posTexto1X'] + $ajusteX,
